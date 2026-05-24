@@ -80,10 +80,12 @@ for p in consolidado:
             f = p["fuentes"][s]
             if f["encontrado"]:
                 cheap = "✅ más barato" if p.get("mas_barato") == s else ""
+                pack_icon = "📦" if f.get("pack_coincide") is True else "🔹"
                 det.append({
                     "Fuente": s, "Estado": "match",
                     "Precio final": f["precioFinal"],
                     "Precio/litro": f.get("precioPorLitro"),
+                    "Pack": pack_icon,
                     "": cheap,
                     "Matcheado como": f["match"],
                     "Score": f["score"],
