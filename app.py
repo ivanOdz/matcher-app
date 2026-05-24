@@ -70,7 +70,7 @@ for p in consolidado:
     rows.append(row)
 st.dataframe(pd.DataFrame(rows), use_container_width=True, hide_index=True)
 
-st.markdown("#### Detalle (precio por litro normalizado, mas barato = si)")
+st.markdown("#### Detalle (precio por litro normalizado)")
 for p in consolidado:
     found = len(p["encontrado_en"])
     with st.expander(f'{p["producto"]} · {p.get("capacidad_ml","?")} ml '
@@ -79,14 +79,12 @@ for p in consolidado:
         for s in sites:
             f = p["fuentes"][s]
             if f["encontrado"]:
-                cheap = "si" if p.get("mas_barato") == s else ""
                 pack_label = "pack" if f.get("pack_coincide") is True else "individual"
                 det.append({
                     "Fuente": s, "Estado": "match",
                     "Precio final": f["precioFinal"],
                     "Precio/litro": f.get("precioPorLitro"),
                     "Pack": pack_label,
-                    "": cheap,
                     "Matcheado como": f["match"],
                     "Score": f["score"],
                     "Link": f["url"],
@@ -94,11 +92,11 @@ for p in consolidado:
             else:
                 det.append({
                     "Fuente": s, "Estado": f["estado"],
-                    "Precio final": None, "Precio/litro": None, "Pack": None, "": "",
+                    "Precio final": None, "Precio/litro": None, "Pack": None,
                     "Matcheado como": f.get("mejor_candidato", "—"),
                     "Score": f.get("score"), "Link": None,
                 })
-        col_order = ["Fuente", "Estado", "Precio final", "Precio/litro", "Pack", "", "Matcheado como", "Score", "Link"]
+        col_order = ["Fuente", "Estado", "Precio final", "Precio/litro", "Pack", "Matcheado como", "Score", "Link"]
         df = pd.DataFrame(det).reindex(columns=col_order)
         st.dataframe(
             df, use_container_width=True, hide_index=True,

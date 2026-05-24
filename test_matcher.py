@@ -32,8 +32,7 @@ def test_heineken_en_tres_fuentes_y_labarraccu_mas_barato():
     h = next(p for p in r["consolidado"]
              if p["producto"] == "Heineken Lata" and p["capacidad_ml"] == 473)
     assert len(h["encontrado_en"]) == 3
-    # labarraccu vende pack X24; normalizado por litro es el más barato
-    assert h["mas_barato"] == "labarraccu"
+    assert "mas_barato" not in h
 
 def test_sidra_1888_va_a_revision():
     r = _run()

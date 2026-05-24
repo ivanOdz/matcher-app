@@ -252,12 +252,6 @@ def run_matching(csv_content, source_contents):
                 cola.append({"producto": t["name"], "fuente": site, "motivo": estado,
                              "mejor_candidato": f"{best['name']} ({best_sc:.2f})",
                              "detalle": " ".join(best_why)})
-        # mark cheapest source by price-per-litre
-        ppls = [(s, prod["fuentes"][s].get("precioPorLitro"))
-                for s in prod["encontrado_en"] if prod["fuentes"][s].get("precioPorLitro")]
-        if ppls:
-            cheapest = min(ppls, key=lambda x: x[1])[0]
-            prod["mas_barato"] = cheapest
         consolidado.append(prod)
 
     metricas = {
