@@ -98,8 +98,10 @@ for p in consolidado:
                     "Matcheado como": f.get("mejor_candidato", "—"),
                     "Score": f.get("score"), "Link": f.get("url_candidato"),
                 })
+        col_order = ["Fuente", "Estado", "Precio final", "Precio/litro", "Pack", "", "Matcheado como", "Score", "Link"]
+        df = pd.DataFrame(det).reindex(columns=col_order)
         st.dataframe(
-            pd.DataFrame(det), use_container_width=True, hide_index=True,
+            df, use_container_width=True, hide_index=True,
             column_config={"Link": st.column_config.LinkColumn("Link", display_text="abrir")},
         )
 
