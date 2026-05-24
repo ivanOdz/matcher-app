@@ -106,8 +106,6 @@ def score(t, c):
     cc = cap_close(t["cap_ml"], c["cap_ml"])
     if cc is False:
         return 0, [f"cap {t['cap_ml']}!={c['cap_ml']}"], True
-    if t["pack"] and (not c["pack"] or c["pack"] != t["pack"]):
-        return 0, [f"pack target={t['pack']}, candidato={c['pack'] or 'desconocido'}"], True
     t_neg = any(k in t["fname"] for k in NEGATIVE)
     c_neg = any(k in c["fname"] for k in NEGATIVE)
     if t_neg != c_neg:
@@ -121,7 +119,6 @@ def score(t, c):
         return 0, [f"candidate flavored ({c_flavor})"], True
     s = 0.40; reasons.append("brand")
     if cc is True: s += 0.10; reasons.append("cap")
-    if t["pack"] and c["pack"] and t["pack"] == c["pack"]: s += 0.10; reasons.append("pack")
     if t.get("fmt"):
         cf = beer_format(c["cap_ml"], c["name"])
         if cf == t["fmt"]: s += 0.05; reasons.append(f"fmt={t['fmt']}")
