@@ -166,7 +166,7 @@ def price_per_litre(price, cap_ml, pack):
 # ------------------------------------------------------------------ #
 # MAIN ENTRY POINT
 # ------------------------------------------------------------------ #
-def run_matching(csv_content, source_contents):
+def run_matching(csv_content, source_contents, filename=""):
     # --- load + group sources by their `sitio` field (generic upload) ---
     by_site = defaultdict(list)
     for content in source_contents:
@@ -184,10 +184,14 @@ def run_matching(csv_content, source_contents):
             for k in rec["brands"]:
                 brand_index[s][k].append(rec)
 
-    # --- load anchor CSV ---
+    # --- load anchor CSV or XLSX ---
     targets = []
-    reader = csv.DictReader(io.StringIO(_text(csv_content)))
-    for row in reader:
+    if filename.endswith(".xlsx"):
+        import pandas as pd
+        rows = pd.read_excel(io.BytesIO(csv_content)).to_dict("records")
+    else:
+        rows = list(csv.DictReader(io.StringIO(_text(csv_content))))
+    for row in rows:
         name = row.get("Producto", "")
         cap = parse_capacity_ml(row.get("Capacidad", ""))
         cat = row.get("Categoria", "")

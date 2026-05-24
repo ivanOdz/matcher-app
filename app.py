@@ -18,7 +18,7 @@ st.caption("Subí el CSV de productos y los JSON de las fuentes. "
 # ------------------------------------------------------------------ #
 col1, col2 = st.columns(2)
 with col1:
-    csv_file = st.file_uploader("CSV de productos (ancla)", type=["csv"])
+    csv_file = st.file_uploader("CSV de productos (ancla)", type=["csv", "xlsx"])
 with col2:
     json_files = st.file_uploader("JSON de fuentes (uno o varios)",
                                   type=["json"], accept_multiple_files=True)
@@ -31,7 +31,8 @@ if not run:
 
 with st.spinner("Procesando matcheos..."):
     result = run_matching(csv_file.getvalue(),
-                          [f.getvalue() for f in json_files])
+                          [f.getvalue() for f in json_files],
+                          filename=csv_file.name)
 
 m = result["metricas"]
 consolidado = result["consolidado"]
