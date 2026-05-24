@@ -8,8 +8,8 @@ import streamlit as st
 import pandas as pd
 from matcher import run_matching
 
-st.set_page_config(page_title="Matcheo de productos", page_icon="🔎", layout="wide")
-st.title("🔎 Matcheo de productos entre fuentes")
+st.set_page_config(page_title="Matcheo de productos", layout="wide")
+st.title("Matcheo de productos entre fuentes")
 st.caption("Subí el CSV de productos y los JSON de las fuentes. "
            "Las fuentes se detectan solas por el campo `sitio` de cada archivo.")
 
@@ -65,12 +65,12 @@ for p in consolidado:
            "Capacidad": f'{p["capacidad_ml"]} ml' if p["capacidad_ml"] else "?",
            "Unidades": p["unidades"] or "-"}
     for s in sites:
-        row[s] = "✅" if p["fuentes"][s]["encontrado"] else "—"
+        row[s] = "si" if p["fuentes"][s]["encontrado"] else "no"
     row["Cobertura"] = f'{len(p["encontrado_en"])}/{len(sites)}'
     rows.append(row)
 st.dataframe(pd.DataFrame(rows), use_container_width=True, hide_index=True)
 
-st.markdown("#### Detalle (precio por litro normalizado, ✅ = más barato)")
+st.markdown("#### Detalle (precio por litro normalizado, mas barato = si)")
 for p in consolidado:
     found = len(p["encontrado_en"])
     with st.expander(f'{p["producto"]} · {p.get("capacidad_ml","?")} ml '
@@ -79,13 +79,13 @@ for p in consolidado:
         for s in sites:
             f = p["fuentes"][s]
             if f["encontrado"]:
-                cheap = "✅ más barato" if p.get("mas_barato") == s else ""
-                pack_icon = "📦" if f.get("pack_coincide") is True else "🔹"
+                cheap = "si" if p.get("mas_barato") == s else ""
+                pack_label = "pack" if f.get("pack_coincide") is True else "individual"
                 det.append({
                     "Fuente": s, "Estado": "match",
                     "Precio final": f["precioFinal"],
                     "Precio/litro": f.get("precioPorLitro"),
-                    "Pack": pack_icon,
+                    "Pack": pack_label,
                     "": cheap,
                     "Matcheado como": f["match"],
                     "Score": f["score"],
@@ -94,9 +94,9 @@ for p in consolidado:
             else:
                 det.append({
                     "Fuente": s, "Estado": f["estado"],
-                    "Precio final": None, "Precio/litro": None, "": "",
+                    "Precio final": None, "Precio/litro": None, "Pack": None, "": "",
                     "Matcheado como": f.get("mejor_candidato", "—"),
-                    "Score": f.get("score"), "Link": f.get("url_candidato"),
+                    "Score": f.get("score"), "Link": None,
                 })
         col_order = ["Fuente", "Estado", "Precio final", "Precio/litro", "Pack", "", "Matcheado como", "Score", "Link"]
         df = pd.DataFrame(det).reindex(columns=col_order)
