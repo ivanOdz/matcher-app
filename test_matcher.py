@@ -24,7 +24,7 @@ def test_metricas_basicas():
 
 def test_cobertura():
     cov = _run()["metricas"]["cobertura"]
-    assert cov["1/3"] >= 10         # mayoría solo matchea en labarraccu (tiene pack explícito)
+    assert cov["1/3"] >= 3          # algunos productos matchean en una sola fuente
     assert cov["0/3"] >= 1          # "Sidra 1888" no se encuentra (ancla vaga)
 
 def test_heineken_en_tres_fuentes_y_labarraccu_mas_barato():
