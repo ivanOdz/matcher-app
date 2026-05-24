@@ -33,7 +33,7 @@ def canon_brand(b):
     return BRAND_ALIASES.get(f, f)
 
 def parse_capacity_ml(text):
-    t = fold(text).replace(",", ".")
+    t = fold(str(text).replace(",", "."))
     m = re.search(r"(\d+(?:\.\d+)?)\s*(l|lt|lts|litros?)\b", t)
     if m: return round(float(m.group(1)) * 1000)
     m = re.search(r"(\d+(?:\.\d+)?)\s*(ml|cc|cm3)\b", t)
@@ -82,7 +82,7 @@ def resolve_brands(marca, name):
 
 STOP = {"cerveza", "cervezas", "rubia", "blanca", "negra", "botella", "lata",
         "porron", "porrones", "en", "ml", "cc", "cm3", "l", "lt", "lts", "de",
-        "x", "un", "u", "unidades", "pack", "vino", "agua", "mineral",
+        "x", "un", "u", "unidades", "pack", "sixpack", "vino", "agua", "mineral",
         "saborizada", "sidra", "sin", "gas", "sifon", "pura", "malta", "stout",
         "del", "la", "el"}
 def descriptor(tokens, cap_ml, pack):
@@ -215,15 +215,28 @@ def run_matching(csv_content, source_contents, filename=""):
                 if not fail:
                     scored.append((sc, why, c))
             scored.sort(key=lambda x: -x[0])
+            if not cands:
+                motivo = "NO_BRAND"
+                detalle = f"marca '{t['brand']}' no encontrada en {site}"
+            elif not scored:
+                _, why, _ = score(t, cands[0])
+                motivo = "ALL_FAILED"
+                detalle = f"{len(cands)} candidatos, primer fallo: {' '.join(why)}"
             if not scored:
-                prod["fuentes"][site] = {"encontrado": False, "estado": "NO_CANDIDATE",
-                                         "url": None, "precioLista": None, "precioFinal": None}
-                cola.append({"producto": t["name"], "fuente": site, "motivo": "NO_CANDIDATE",
-                             "mejor_candidato": "", "detalle": ""})
+                prod["fuentes"][site] = {"encontrado": False, "estado": motivo,
+                                         "url": None, "precioLista": None, "precioFinal": None,
+                                         "detalle": detalle}
+                cola.append({"producto": t["name"], "fuente": site, "motivo": motivo,
+                             "mejor_candidato": cands[0]["name"] if cands else "", "detalle": detalle})
                 continue
             best_sc, best_why, best = scored[0]
             runner = scored[1][0] if len(scored) > 1 else 0
             ambiguous = (best_sc - runner) < AMBIG_GAP and len(scored) > 1
+            if ambiguous:
+                best_desc = descriptor(best["tokens"], best["cap_ml"], best["pack"]) - {t["brand"]}
+                runner_desc = descriptor(scored[1][2]["tokens"], scored[1][2]["cap_ml"], scored[1][2]["pack"]) - {t["brand"]}
+                if best_desc == runner_desc:
+                    ambiguous = False
             if best_sc >= ACCEPT and not ambiguous:
                 ppl = price_per_litre(best["realPrice"], best["cap_ml"], best["pack"])
                 prod["fuentes"][site] = {
