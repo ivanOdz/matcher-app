@@ -79,12 +79,10 @@ for p in consolidado:
         for s in sites:
             f = p["fuentes"][s]
             if f["encontrado"]:
-                pack_label = "pack" if f.get("pack_coincide") is True else "individual"
                 det.append({
                     "Fuente": s, "Estado": "match",
                     "Precio final": f["precioFinal"],
                     "Precio/litro": f.get("precioPorLitro"),
-                    "Pack": pack_label,
                     "Matcheado como": f["match"],
                     "Score": f["score"],
                     "Link": f["url"],
@@ -92,11 +90,11 @@ for p in consolidado:
             else:
                 det.append({
                     "Fuente": s, "Estado": f["estado"],
-                    "Precio final": None, "Precio/litro": None, "Pack": None,
+                    "Precio final": None, "Precio/litro": None,
                     "Matcheado como": f.get("mejor_candidato", "—"),
                     "Score": f.get("score"), "Link": None,
                 })
-        col_order = ["Fuente", "Estado", "Precio final", "Precio/litro", "Pack", "Matcheado como", "Score", "Link"]
+        col_order = ["Fuente", "Estado", "Precio final", "Precio/litro", "Matcheado como", "Score", "Link"]
         df = pd.DataFrame(det).reindex(columns=col_order)
         st.dataframe(
             df, use_container_width=True, hide_index=True,

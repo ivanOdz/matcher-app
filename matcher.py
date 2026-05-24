@@ -106,8 +106,8 @@ def score(t, c):
     cc = cap_close(t["cap_ml"], c["cap_ml"])
     if cc is False:
         return 0, [f"cap {t['cap_ml']}!={c['cap_ml']}"], True
-    if t["pack"] and c["pack"] and c["pack"] != t["pack"]:
-        return 0, [f"pack target={t['pack']}, candidato={c['pack']}"], True
+    if t["pack"] and (not c["pack"] or c["pack"] != t["pack"]):
+        return 0, [f"pack target={t['pack']}, candidato={c['pack'] or 'desconocido'}"], True
     t_neg = any(k in t["fname"] for k in NEGATIVE)
     c_neg = any(k in c["fname"] for k in NEGATIVE)
     if t_neg != c_neg:
@@ -231,7 +231,6 @@ def run_matching(csv_content, source_contents):
                     "precioPorLitro": ppl, "seller": best["seller"],
                     "ean": best["ean"] or None, "sku": best["sku"] or None,
                     "match": best["name"], "score": round(best_sc, 3),
-                    "pack_coincide": (best["pack"] == t["pack"]) if (best["pack"] and t["pack"]) else None,
                 }
                 prod["encontrado_en"].append(site)
                 plano.append({
